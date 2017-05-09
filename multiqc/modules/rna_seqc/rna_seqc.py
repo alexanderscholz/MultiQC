@@ -40,6 +40,13 @@ class MultiqcModule(BaseMultiqcModule):
         for f in self.find_log_files('rna_seqc/correlation'):
             self.parse_correlation(f)
 
+        # Filters to strip out ignored sample names
+        self.rna_seqc_metrics = self.ignore_samples(self.rna_seqc_metrics)
+        self.rna_seqc_norm_high_cov = self.ignore_samples(self.rna_seqc_norm_high_cov)
+        self.rna_seqc_norm_medium_cov = self.ignore_samples(self.rna_seqc_norm_medium_cov)
+        self.rna_seqc_norm_low_cov = self.ignore_samples(self.rna_seqc_norm_low_cov)
+        # TODO: self.rna_seqc_pearson and self.rna_seqc_spearman are trickier to filter
+
         num_found = max( len(self.rna_seqc_metrics), len(self.rna_seqc_norm_high_cov),
                          len(self.rna_seqc_norm_medium_cov), len(self.rna_seqc_norm_low_cov) )
         if self.rna_seqc_pearson is not None:
@@ -89,8 +96,7 @@ class MultiqcModule(BaseMultiqcModule):
             'min': 0,
             'suffix': '%',
             'scale': 'YlGn',
-            'modify': lambda x: float(x) * 100.0,
-            'format': '{:.1f}%'
+            'modify': lambda x: float(x) * 100.0
         }
         headers['Intronic Rate'] = {
             'title': '% Intronic',
@@ -99,15 +105,14 @@ class MultiqcModule(BaseMultiqcModule):
             'min': 0,
             'suffix': '%',
             'scale': 'YlGn',
-            'modify': lambda x: float(x) * 100.0,
-            'format': '{:.1f}%'
+            'modify': lambda x: float(x) * 100.0
         }
         headers['Genes Detected'] = {
             'title': '# Genes',
             'description': 'Number of genes detected',
             'min': 0,
             'scale': 'Bu',
-            'format': '{:.0f}'
+            'format': '{:,.0f}'
         }
         self.general_stats_addcols(self.rna_seqc_metrics, headers)
 

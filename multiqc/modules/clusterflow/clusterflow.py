@@ -42,6 +42,10 @@ class MultiqcModule(BaseMultiqcModule):
                 self.clusterflow_runfiles[f['s_name']] = parsed_data
                 self.add_data_source(f, 'runfile')
 
+        # Filters to strip out ignored sample names
+        self.clusterflow_commands = self.ignore_samples(self.clusterflow_commands)
+        self.clusterflow_runfiles = self.ignore_samples(self.clusterflow_runfiles)
+
         if len(self.clusterflow_commands) == 0 and len(self.clusterflow_runfiles) == 0:
             log.debug("Could not find any reports in {}".format(config.analysis_dir))
             raise UserWarning
@@ -301,7 +305,7 @@ class MultiqcModule(BaseMultiqcModule):
         headers['pipeline_name'] = {'title': 'Pipeline Name'}
         headers['pipeline_start'] = {'title': 'Date Started', 'description': 'Date and time that pipeline was started (YYYY-MM-DD HH:SS)'}
         headers['genome'] = {'title': 'Genome ID', 'description': 'ID of reference genome used'}
-        headers['num_starting_files'] = {'title': '# Starting Files', 'format': '{:.0f}', 'description': 'Number of input files at start of pipeline run.'}
+        headers['num_starting_files'] = {'title': '# Starting Files', 'format': '{:,.0f}', 'description': 'Number of input files at start of pipeline run.'}
         table_config = {
             'namespace': 'Cluster Flow',
             'id': 'clusterflow-pipelines',

@@ -31,6 +31,9 @@ class MultiqcModule(BaseMultiqcModule):
         for f in self.find_log_files('snpeff', filehandles=True):
             self.parse_snpeff_log(f)
 
+        # Filter to strip out ignored sample names
+        self.snpeff_data = self.ignore_samples(self.snpeff_data)
+
         if len(self.snpeff_data) == 0:
             log.debug("Could not find any data in {}".format(config.analysis_dir))
             raise UserWarning
@@ -140,12 +143,12 @@ class MultiqcModule(BaseMultiqcModule):
             'title': 'Change rate',
             'scale': 'RdYlBu-rev',
             'min': 0,
-            'format': '{:.0f}'
+            'format': '{:,.0f}'
         }
         headers['Ts_Tv_ratio'] = {
             'title': 'Ts/Tv',
             'description': 'Transitions / Transversions ratio',
-            'format': '{:.3f}'
+            'format': '{:,.3f}'
         }
         headers['Number_of_variants_before_filter'] = {
             'title': 'M Variants',
@@ -153,7 +156,7 @@ class MultiqcModule(BaseMultiqcModule):
             'scale': 'PuRd',
             'modify': lambda x: x / 1000000,
             'min': 0,
-            'format': '{:.2f}'
+            'format': '{:,.2f}'
         }
         self.general_stats_addcols(self.snpeff_data, headers)
 
@@ -182,7 +185,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 
     def effects_impact_plot(self):
-        """ Generate the SnpEff Counts by Genomic Region plot """
+        """ Generate the SnpEff Counts by Effects Impact plot """
 
         # Put keys in a more logical order
         keys = [ 'MODIFIER', 'LOW', 'MODERATE', 'HIGH' ]
@@ -195,7 +198,7 @@ class MultiqcModule(BaseMultiqcModule):
         # Config for the plot
         pconfig = {
             'id': 'snpeff_variant_effects_impact',
-            'title': 'SnpEff: Counts by Genomic Region',
+            'title': 'SnpEff: Counts by Effects Impact',
             'ylab': '# Reads',
             'logswitch': True
         }

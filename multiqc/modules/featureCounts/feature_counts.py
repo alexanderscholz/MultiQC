@@ -31,6 +31,9 @@ class MultiqcModule(BaseMultiqcModule):
         for f in self.find_log_files('featurecounts'):
             self.parse_featurecounts_report(f)
 
+        # Filter to strip out ignored sample names
+        self.featurecounts_data = self.ignore_samples(self.featurecounts_data)
+
         if len(self.featurecounts_data) == 0:
             log.debug("Could not find any reports in {}".format(config.analysis_dir))
             raise UserWarning
@@ -112,8 +115,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'RdYlGn',
-            'format': '{:.1f}%'
+            'scale': 'RdYlGn'
         }
         headers['Assigned'] = {
             'title': '{} Assigned'.format(config.read_count_prefix),

@@ -87,6 +87,9 @@ class StatsReportMixin():
                     percent_sites = float(s[-1].strip())
                     depth_data[s_name][bin_name] = percent_sites
 
+        # Filter to strip out ignored sample names
+        self.bcftools_stats = self.ignore_samples(self.bcftools_stats)
+
         if len(self.bcftools_stats) > 0:
 
             # Write parsed report data to a file
@@ -149,36 +152,36 @@ class StatsReportMixin():
         stats_headers['number_of_records'] = {
             'title': 'Variations',
             'description': 'Variations Total',
-            'min': 0, 'format': '{:.0f}',
+            'min': 0, 'format': '{:,.0f}',
         }
         stats_headers['variations_hom'] = {
             'title': 'Homozygous',
             'description': 'Variations homozygous',
-            'min': 0, 'format': '{:.0f}',
+            'min': 0, 'format': '{:,.0f}',
         }
         stats_headers['variations_het'] = {
             'title': 'Heterozygous',
             'description': 'Variations heterozygous',
-            'min': 0, 'format': '{:.0f}',
+            'min': 0, 'format': '{:,.0f}',
         }
         stats_headers['number_of_SNPs'] = {
             'title': 'SNPs',
             'description': 'Variation SNPs',
-            'min': 0, 'format': '{:.0f}',
+            'min': 0, 'format': '{:,.0f}',
         }
         stats_headers['number_of_indels'] = {
             'title': 'Indels',
             'description': 'Variation Insertions/Deletions',
-            'min': 0, 'format': '{:.0f}',
+            'min': 0, 'format': '{:,.0f}',
         }
         stats_headers['tstv'] = {
             'title': 'Ts/Tv',
             'description': 'Variant SNP transition / transversion ratio',
-            'min': 0, 'format': '{:.2f}',
+            'min': 0, 'format': '{:,.2f}',
         }
         stats_headers['number_of_MNPs'] = {
             'title': 'MNPs',
             'description': 'Variation Multinucleotide Polymorphisms',
-            'min': 0, 'format': '{:.0f}', "hidden": True,
+            'min': 0, 'format': '{:,.0f}', "hidden": True,
         }
         self.general_stats_addcols(self.bcftools_stats, stats_headers, 'Bcftools Stats')

@@ -4,9 +4,7 @@
 
 from __future__ import print_function
 from collections import OrderedDict
-import json
 import logging
-import os
 import re
 
 from multiqc import config
@@ -30,6 +28,9 @@ class MultiqcModule(BaseMultiqcModule):
         for f in self.find_log_files('trimmomatic', filehandles=True):
             self.parse_trimmomatic(f)
 
+        # Filter to strip out ignored sample names
+        self.trimmomatic = self.ignore_samples(self.trimmomatic)
+
         if len(self.trimmomatic) == 0:
             log.debug("Could not find any Trimmomatic data in {}".format(config.analysis_dir))
             raise UserWarning
@@ -45,8 +46,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'OrRd',
-            'format': '{:.1f}%'
+            'scale': 'OrRd'
         }
         self.general_stats_addcols(self.trimmomatic, headers)
 

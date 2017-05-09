@@ -32,22 +32,26 @@ def parse_reports(self):
     self.qualimap_bamqc_genome_results = dict()
     for f in self.find_log_files('qualimap/bamqc/genome_results'):
         parse_genome_results(self, f)
+    self.qualimap_bamqc_genome_results = self.ignore_samples(self.qualimap_bamqc_genome_results)
 
     # Coverage - coverage_histogram.txt
     self.qualimap_bamqc_coverage_hist = dict()
     for f in self.find_log_files('qualimap/bamqc/coverage', filehandles=True):
         parse_coverage(self, f)
+    self.qualimap_bamqc_coverage_hist = self.ignore_samples(self.qualimap_bamqc_coverage_hist)
 
     # Insert size - insert_size_histogram.txt
     self.qualimap_bamqc_insert_size_hist = dict()
     for f in self.find_log_files('qualimap/bamqc/insert_size', filehandles=True):
         parse_insert_size(self, f)
+    self.qualimap_bamqc_insert_size_hist = self.ignore_samples(self.qualimap_bamqc_insert_size_hist)
 
     # GC distribution - mapped_reads_gc-content_distribution.txt
     self.qualimap_bamqc_gc_content_dist = dict()
     self.qualimap_bamqc_gc_by_species = dict()  # {'HUMAN': data_dict, 'MOUSE': data_dict}
     for f in self.find_log_files('qualimap/bamqc/gc_dist', filehandles=True):
         parse_gc_dist(self, f)
+    self.qualimap_bamqc_gc_by_species = self.ignore_samples(self.qualimap_bamqc_gc_by_species)
 
     # Make the plots for the report
     report_sections(self)
@@ -343,7 +347,7 @@ def general_stats_headers (self):
         'min': 0,
         'suffix': '%',
         'scale': 'Set1',
-        'format': '{:.0f}%'
+        'format': '{:,.0f}'
     }
     self.general_stats_headers['median_insert_size'] = {
         'title': 'Insert Size',
@@ -351,7 +355,7 @@ def general_stats_headers (self):
         'min': 0,
         'suffix': 'bp',
         'scale': 'PuOr',
-        'format': '{:.0f}'
+        'format': '{:,.0f}'
     }
     for c in self.covs:
         self.general_stats_headers['{}_x_pc'.format(c)] = {
@@ -361,7 +365,6 @@ def general_stats_headers (self):
             'min': 0,
             'suffix': '%',
             'scale': 'RdYlGn',
-            'format': '{:.1f}%',
             'hidden': c in hidecovs
         }
     self.general_stats_headers['median_coverage'] = {
@@ -377,25 +380,24 @@ def general_stats_headers (self):
         'max': 100,
         'min': 0,
         'suffix': '%',
-        'scale': 'YlGn',
-        'format': '{:.1f}%'
+        'scale': 'YlGn'
     }
     self.general_stats_headers['mapped_reads'] = {
-        'title': 'Aligned',
-        'description': 'Number of mapped reads (millions)',
+        'title': '{} Aligned'.format(config.read_count_prefix),
+        'description': 'Number of mapped reads ({})'.format(config.read_count_desc),
         'min': 0,
         'scale': 'RdYlGn',
         'shared_key': 'read_count',
-        'modify': lambda x: x / 1000000,
+        'modify': lambda x: x * config.read_count_multiplier,
         'hidden': True
     }
     self.general_stats_headers['total_reads'] = {
-        'title': 'Total reads',
-        'description': 'Number of reads (millions)',
+        'title': '{} Total reads'.format(config.read_count_prefix),
+        'description': 'Number of reads ({})'.format(config.read_count_desc),
         'min': 0,
         'scale': 'Blues',
         'shared_key': 'read_count',
-        'modify': lambda x: x / 1000000,
+        'modify': lambda x: x * config.read_count_multiplier,
         'hidden': True
     }
 

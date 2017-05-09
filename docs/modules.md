@@ -274,6 +274,22 @@ class MultiqcModule(BaseMultiqcModule):
         return data
 ```
 
+### Filtering by parsed sample names
+MultiQC users can use the `--ignore-samples` flag to skip sample names
+that match specific patterns. As sample names are generated in a different
+way by every module, this filter has to be applied after log parsing.
+
+There is a core function to do this task - assuming that your data is
+in a dictionary with the first key as sample name, pass it through the
+`self.ignore_samples` function as follows:
+
+```python
+self.yourdata = self.ignore_samples(self.yourdata)
+```
+
+This will remove any dictionary keys where the sample name matches
+a user pattern.
+
 ### No files found
 If your module cannot find any matching files, it needs to raise an
 exception of type `UserWarning`. This tells the core MultiQC program
@@ -377,7 +393,7 @@ headers['second_col'] = {
     'max': 100,
     'min': 0,
     'scale': 'Blues',
-    'format': '{:.1f}%'
+    'suffix': '%'
 }
 self.general_stats_addcols(data, headers)
 ```
@@ -391,7 +407,7 @@ headers['name'] = {
     'max': None,                    # Minimum value in range, for bar / colour coding
     'min': None,                    # Maximum value in range, for bar / colour coding
     'scale': 'GnBu',                # Colour scale for colour coding. Set to False to disable.
-    'format': '{:.1f}',             # Output format() string
+    'format': '{:,.1f}',            # Output format() string
     'shared_key': None              # See below for description
     'modify': None,                 # Lambda function to modify values
     'hidden': False                 # Set to True to hide the column on page load
@@ -411,13 +427,23 @@ headers['name'] = {
     the read count in a sample can be seen varying across analysis modules.
 * `modify`
   * A python `lambda` function to change the data in some way when it is
-    inserted into the table. Typically, this is used to divide numbers to
-    show millions: `'modify': lambda x: x / 1000000`
+    inserted into the table.
 * `hidden`
   * Setting this to `True` will hide the column when the report loads. It can
     then be shown through the _Configure Columns_ modal in the report. This can
     be useful when data could be sometimes useful. For example, some modules
     show "percentage aligned" on page load but hide "number of reads aligned".
+
+The typical use for the `modify` string is to divide large numbers such as read counts,
+to make them easier to interpret. If handling read counts, there are three config variables
+that should be used to allow users to change the multiplier: `read_count_multiplier`,
+`read_count_prefix` and `read_count_desc`. For example:
+
+```python
+'title': '{} Reads'.format(config.read_count_prefix),
+'description': 'Number of reads ({})'.format(config.read_count_desc),
+'modify': lambda x: x * config.read_count_multiplier,
+```
 
 The colour scales are from [ColorBrewer2](http://colorbrewer2.org/) and are named as follows:
 ![color brewer](images/cbrewer_scales.png)

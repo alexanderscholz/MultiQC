@@ -27,6 +27,10 @@ class MultiqcModule(BaseMultiqcModule):
         self.samblaster_data = dict()
         for f in self.find_log_files('samblaster', filehandles=True):
             self.parse_samblaster(f)
+
+        # Filter to strip out ignored sample names
+        self.samblaster_data = self.ignore_samples(self.samblaster_data)
+
         if len(self.samblaster_data) == 0:
             log.debug("Could not find any data in {}".format(config.analysis_dir))
             raise UserWarning
@@ -38,8 +42,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'OrRd',
-            'format': '{:.1f}%'
+            'scale': 'OrRd'
         }
 
         self.general_stats_addcols(self.samblaster_data, headers)

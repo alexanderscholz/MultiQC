@@ -7,7 +7,6 @@ import logging
 import os
 import re
 
-from multiqc import config
 from multiqc.plots import bargraph
 
 # Initialise the logger
@@ -63,6 +62,9 @@ def parse_reports(self):
             self.add_data_source(f, s_name, section='RrbsSummaryMetrics')
             self.picard_rrbs_metrics[s_name] = parsed_data[s_name]
 
+    # Filter to strip out ignored sample names
+    self.picard_rrbs_metrics = self.ignore_samples(self.picard_rrbs_metrics)
+
     if len(self.picard_rrbs_metrics) > 0:
 
         # Write parsed data to a file
@@ -75,7 +77,7 @@ def parse_reports(self):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'format': '{:.0f}%',
+            'format': '{:,.0f}',
             'scale': 'RdYlGn-rev',
             'modify': lambda x: 100 - self.multiply_hundred(x)
         }
@@ -85,7 +87,7 @@ def parse_reports(self):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'format': '{:.0f}%',
+            'format': '{:,.0f}',
             'scale': 'RdYlGn',
             'modify': lambda x: 100 - self.multiply_hundred(x)
         }

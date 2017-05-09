@@ -25,6 +25,9 @@ class VariantEvalMixin():
                 self.add_data_source(f, section='varianteval')
                 self.gatk_varianteval[f['s_name']] = parsed_data
 
+        # Filter to strip out ignored sample names
+        self.gatk_varianteval = self.ignore_samples(self.gatk_varianteval)
+
         if len(self.gatk_varianteval) > 0:
 
             # Write parsed report data to a file (restructure first)
@@ -180,7 +183,8 @@ def comp_overlap_table(data):
         'namespace': 'GATK',
         'min': 0,
         'max': 100,
-        'format': '{:.2f}%',
+        'suffix': '%',
+        'format': '{:,.2f}',
         'scale': 'Blues',
     }
     headers['concordant_rate'] = {
@@ -189,7 +193,8 @@ def comp_overlap_table(data):
         'namespace': 'GATK',
         'min': 0,
         'max': 100,
-        'format': '{:.2f}%',
+        'suffix': '%',
+        'format': '{:,.2f}',
         'scale': 'Blues',
     }
     headers['eval_variants'] = {

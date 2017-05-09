@@ -47,6 +47,9 @@ class MultiqcModule(BaseMultiqcModule):
                 continue
             self.parse_bowtie_logs(f)
 
+        # Filter to strip out ignored sample names
+        self.bowtie_data = self.ignore_samples(self.bowtie_data)
+
         if len(self.bowtie_data) == 0:
             log.debug("Could not find any reports in {}".format(config.analysis_dir))
             raise UserWarning
@@ -117,8 +120,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'YlGn',
-            'format': '{:.1f}%'
+            'scale': 'YlGn'
         }
         headers['reads_aligned'] = {
             'title': '{} Aligned'.format(config.read_count_prefix),

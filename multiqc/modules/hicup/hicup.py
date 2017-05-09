@@ -29,6 +29,9 @@ class MultiqcModule(BaseMultiqcModule):
         for f in self.find_log_files('hicup'):
             self.parse_hicup_logs(f)
 
+        # Filter to strip out ignored sample names
+        self.hicup_data = self.ignore_samples(self.hicup_data)
+
         if len(self.hicup_data) == 0:
             log.debug("Could not find any HiCUP data in {}".format(config.analysis_dir))
             raise UserWarning
@@ -109,8 +112,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'YlGn',
-            'format': '{:.1f}%',
+            'scale': 'YlGn'
         }
         headers['Deduplication_Read_Pairs_Uniques'] = {
             'title': '{} Unique'.format(config.read_count_prefix),
@@ -127,8 +129,7 @@ class MultiqcModule(BaseMultiqcModule):
             'min': 0,
             'suffix': '%',
             'scale': 'YlGn-rev',
-            'modify': lambda x: 100 - x,
-            'format': '{:.1f}%',
+            'modify': lambda x: 100 - x
         }
         headers['Valid_Pairs'] = {
             'title': '{} Valid'.format(config.read_count_prefix),
@@ -144,8 +145,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'YlGn',
-            'format': '{:.1f}%',
+            'scale': 'YlGn'
         }
         headers['Paired_Read_1'] = {
             'title': '{} Pairs Aligned'.format(config.read_count_prefix),
@@ -161,8 +161,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'YlGn',
-            'format': '{:.1f}%',
+            'scale': 'YlGn'
         }
         self.general_stats_addcols(self.hicup_data, headers, 'HiCUP')
 

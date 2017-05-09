@@ -98,6 +98,10 @@ def parse_reports(self):
         self.qualimap_rnaseq_cov_hist[s_name] = d
         self.add_data_source(f, s_name=s_name, section='rna_coverage_histogram')
 
+    # Filter to strip out ignored sample names
+    self.qualimap_rnaseq_genome_results = self.ignore_samples(self.qualimap_rnaseq_genome_results)
+    self.qualimap_rnaseq_cov_hist = self.ignore_samples(self.qualimap_rnaseq_cov_hist)
+
     #### Plots
 
     # Genomic Origin Bar Graph
@@ -138,7 +142,7 @@ def parse_reports(self):
     #### General Stats
     self.general_stats_headers['5_3_bias'] = {
         'title': "5'-3' bias",
-        'format': '{:.2f}',
+        'format': '{:,.2f}',
     }
     self.general_stats_headers['reads_aligned'] = {
         'title': '{} Aligned'.format(config.read_count_prefix),

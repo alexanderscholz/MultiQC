@@ -2,12 +2,9 @@
 
 """ MultiQC submodule to parse output from Picard OxoGMetrics """
 
-from collections import OrderedDict
 import logging
 import os
 import re
-
-from multiqc import config
 
 # Initialise the logger
 log = logging.getLogger(__name__)
@@ -73,6 +70,9 @@ def parse_reports(self):
                 self.picard_OxoGMetrics_data[s_name] = parsed_data[idx]
 
 
+    # Filter to strip out ignored sample names
+    self.picard_OxoGMetrics_data = self.ignore_samples(self.picard_OxoGMetrics_data)
+
     if len(self.picard_OxoGMetrics_data) > 0:
 
         # Write parsed data to a file
@@ -99,7 +99,7 @@ def parse_reports(self):
             'max': 1,
             'min': 0,
             'suffix': '%',
-            'format': '{:.0f}%',
+            'format': '{:,.0f}',
             'scale': 'RdYlGn-rev',
             'modify': lambda x: self.multiply_hundred(x)
         }

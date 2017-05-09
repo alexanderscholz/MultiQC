@@ -67,6 +67,9 @@ class MultiqcModule(BaseMultiqcModule):
             except KeyError:
                 log.warning("Error - can't find fastqc_raw_data.txt in {}".format(f))
 
+        # Filter to strip out ignored sample names
+        self.fastqc_data = self.ignore_samples(self.fastqc_data)
+
         if len(self.fastqc_data) == 0:
             log.debug("Could not find any reports in {}".format(config.analysis_dir))
             raise UserWarning
@@ -221,8 +224,7 @@ class MultiqcModule(BaseMultiqcModule):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'scale': 'RdYlGn-rev',
-            'format': '{:.1f}%'
+            'scale': 'RdYlGn-rev'
         }
         headers['percent_gc'] = {
             'title': '% GC',
@@ -231,15 +233,15 @@ class MultiqcModule(BaseMultiqcModule):
             'min': 0,
             'suffix': '%',
             'scale': 'Set1',
-            'format': '{:.0f}%'
+            'format': '{:,.0f}'
         }
         headers['avg_sequence_length'] = {
             'title': 'Length',
             'description': 'Average Sequence Length (bp)',
             'min': 0,
-            'suffix': 'bp',
+            'suffix': ' bp',
             'scale': 'RdYlGn',
-            'format': '{:.0f}',
+            'format': '{:,.0f}',
             'hidden': hide_seq_length
         }
         headers['percent_fails'] = {
@@ -249,7 +251,7 @@ class MultiqcModule(BaseMultiqcModule):
             'min': 0,
             'suffix': '%',
             'scale': 'Reds',
-            'format': '{:.0f}%',
+            'format': '{:,.0f}',
             'hidden': True
         }
         headers['total_sequences'] = {

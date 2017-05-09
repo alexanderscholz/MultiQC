@@ -40,6 +40,8 @@ and more examples.
 To see what changes need to applied to your custom plugin code, please see the [MultiQC docs](http://multiqc.info/docs/#v1.0-updates).
 
 ### Module updates:
+* [**Adapter Removal**](https://github.com/mikkelschubert/adapterremoval) - new module!
+  * AdapterRemoval v2 - rapid adapter trimming, identification, and read merging
 * [**BUSCO**](http://busco.ezlab.org/) - new module!
   * New module for the `BUSCO v2` tool, used for assessing genome assembly and annotation completeness.
 * [**Cluster Flow**](http://clusterflow.io) - new module!
@@ -81,9 +83,14 @@ To see what changes need to applied to your custom plugin code, please see the [
 * Module file search has been rewritten (see above changes to configs)
   * Significant improvement in search speed (test dataset runs in approximately half the time)
   * More options for modules to find their logs, eg. filename and contents matching regexes (see the [docs](http://multiqc.info/docs/#step-1-find-log-files))
+* New `--ignore-samples` option to skip samples based on parsed sample name
+  * Alternative to filtering by input filename, which doesn't always work
+  * Also can use config vars `sample_names_ignore` (glob patterns) and `sample_names_ignore_re` (regex patterns).
 * New config option to change numeric multiplier in General Stats
   * For example, if reports have few reads, can show `Thousands of Reads` instead of `Millions of Reads`
   * Set config options `read_count_multiplier`, `read_count_prefix` and `read_count_desc`
+* Config options `decimalPoint_format` and `thousandsSep_format` now apply to tables as well as plots
+  * By default, thosands will now be separated with a space and `.` used for decimal places.
 * Module sections tidied and refactored
   * New helper function `self.add_section()`
   * Sections hidden in nav if no title (no more need for the hacky `self.intro += `)

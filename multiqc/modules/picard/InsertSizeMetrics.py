@@ -7,7 +7,6 @@ import logging
 import os
 import re
 
-from multiqc import config
 from multiqc.plots import linegraph
 
 # Initialise the logger
@@ -108,6 +107,9 @@ def parse_reports(self):
                 break
 
 
+    # Filter to strip out ignored sample names
+    self.picard_insertSize_data = self.ignore_samples(self.picard_insertSize_data)
+
     if len(self.picard_insertSize_data) > 0:
 
         # Write parsed data to a file
@@ -125,7 +127,7 @@ def parse_reports(self):
             'description': 'Median Insert Size, all read orientations (bp)',
             'min': 0,
             'suffix': 'bp',
-            'format': '{:.0f}',
+            'format': '{:,.0f}',
             'scale': 'GnBu',
         }
         self.general_stats_headers['summed_mean'] = {
@@ -133,7 +135,7 @@ def parse_reports(self):
             'description': 'Mean Insert Size, all read orientations (bp)',
             'min': 0,
             'suffix': 'bp',
-            'format': '{:.0f}',
+            'format': '{:,.0f}',
             'scale': 'GnBu',
             'hidden': False if missing_medians else True
         }

@@ -7,7 +7,6 @@ import logging
 import os
 import re
 
-from multiqc import config
 from multiqc.plots import linegraph, bargraph
 
 # Initialise the logger
@@ -87,6 +86,9 @@ def parse_reports(self):
                 self.picard_RnaSeqMetrics_histogram.pop(s_name, None)
                 log.debug("Ignoring '{}' histogram as no data parsed".format(s_name))
 
+    # Filter to strip out ignored sample names
+    self.picard_RnaSeqMetrics_data = self.ignore_samples(self.picard_RnaSeqMetrics_data)
+
     if len(self.picard_RnaSeqMetrics_data) > 0:
 
         # Write parsed data to a file
@@ -100,7 +102,6 @@ def parse_reports(self):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'format': '{:.1f}%',
             'scale': 'Reds',
         }
         GenStatsHeaders['PCT_MRNA_BASES'] = {
@@ -109,7 +110,6 @@ def parse_reports(self):
             'max': 100,
             'min': 0,
             'suffix': '%',
-            'format': '{:.1f}%',
             'scale': 'Greens',
         }
         self.general_stats_addcols(self.picard_RnaSeqMetrics_data, GenStatsHeaders)

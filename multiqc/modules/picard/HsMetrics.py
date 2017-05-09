@@ -119,6 +119,9 @@ def parse_reports(self):
                 self.picard_HsMetrics_data[this_s_name] = parsed_data[s_name][j]
 
 
+    # Filter to strip out ignored sample names
+    self.picard_HsMetrics_data = self.ignore_samples(self.picard_HsMetrics_data)
+
     if len(self.picard_HsMetrics_data) > 0:
 
         # Write parsed data to a file
@@ -134,7 +137,7 @@ def parse_reports(self):
         self.general_stats_headers['FOLD_ENRICHMENT'] = {
             'title': 'Fold Enrichment',
             'min': 0,
-            'format': '{:.0f}',
+            'format': '{:,.0f}',
             'scale': 'Blues',
         }
         try:
@@ -153,7 +156,7 @@ def parse_reports(self):
                 'max': 100,
                 'min': 0,
                 'suffix': '%',
-                'format': '{:.0f}%',
+                'format': '{:,.0f}',
                 'scale': 'RdYlGn',
                 'modify': lambda x: self.multiply_hundred(x)
             }
@@ -216,9 +219,11 @@ def _get_headers(data):
                 'namespace': 'HsMetrics'
                 }
                 if h.find("READS") > -1:
-                    this.update({'shared_key': "read_count",
-                                 'modify': lambda x: x / 1000000.0})
-                    this['title'] = "M {0}".format(this['title'])
+                    this.update({
+                        'shared_key': "read_count",
+                        'modify': lambda x: x * config.read_count_multiplier
+                        })
+                    this['title'] = "{} {}".format(config.read_count_prefix, this['title'])
                 elif h.find("BASES") > -1:
                     this.update({'shared_key': 'bases_count',
                                  'modify': lambda x: x / 1000000.0})

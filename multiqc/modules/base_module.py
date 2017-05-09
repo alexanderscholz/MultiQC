@@ -5,6 +5,7 @@
 from __future__ import print_function
 from collections import OrderedDict
 import io
+import fnmatch
 import logging
 import os
 import re
@@ -149,6 +150,25 @@ class BaseMultiqcModule(object):
                     s_name = s_name[len(chrs):]
         return s_name
 
+
+    def ignore_samples(self, data):
+        """ Strip out samples which match `sample_names_ignore` """
+        try:
+            if isinstance(data, OrderedDict):
+                newdata = OrderedDict()
+            elif isinstance(data, dict):
+                newdata = dict()
+            else:
+                return data
+            for k,v in data.items():
+                # Match ignore glob patterns
+                glob_match = any( fnmatch.fnmatch(k, sn) for sn in config.sample_names_ignore )
+                re_match = any( re.match(sn, k) for sn in config.sample_names_ignore_re )
+                if not glob_match and not re_match:
+                    newdata[k] = v
+            return newdata
+        except (TypeError, AttributeError):
+            return data
 
     def general_stats_addcols(self, data, headers=None, namespace=None):
         """ Helper function to add to the General Statistics variable.

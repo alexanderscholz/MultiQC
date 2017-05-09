@@ -7,7 +7,6 @@ import logging
 import os
 import re
 
-from multiqc import config
 from multiqc.plots import bargraph
 
 # Initialise the logger
@@ -60,6 +59,9 @@ def parse_reports(self):
                 log.debug("Removing {} as no data parsed".format(s_name))
 
 
+    # Filter to strip out ignored sample names
+    self.picard_dupMetrics_data = self.ignore_samples(self.picard_dupMetrics_data)
+
     if len(self.picard_dupMetrics_data) > 0:
 
         # Write parsed data to a file
@@ -73,7 +75,6 @@ def parse_reports(self):
             'min': 0,
             'suffix': '%',
             'scale': 'OrRd',
-            'format': '{:.1f}%',
             'modify': lambda x: self.multiply_hundred(x)
         }
         for s_name in self.picard_dupMetrics_data:

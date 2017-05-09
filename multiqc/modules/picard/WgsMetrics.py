@@ -80,6 +80,9 @@ def parse_reports(self):
                 self.picard_wgsmetrics_histogram.pop(s_name, None)
                 log.debug("Ignoring '{}' histogram as no data parsed".format(s_name))
 
+    # Filter to strip out ignored sample names
+    self.picard_wgsmetrics_data = self.ignore_samples(self.picard_wgsmetrics_data)
+
     if len(self.picard_wgsmetrics_data) > 0:
 
         # Write parsed data to a file
@@ -91,7 +94,6 @@ def parse_reports(self):
             'description': 'The median coverage in bases of the genome territory, after all filters are applied.',
             'min': 0,
             'suffix': 'X',
-            'format': '{:.1f}',
             'scale': 'GnBu',
         }
 
@@ -112,7 +114,7 @@ def parse_reports(self):
                 'max': 100,
                 'min': 0,
                 'suffix': '%',
-                'format': '{:.0f}%',
+                'format': '{:,.0f}',
                 'scale': 'RdYlGn',
                 'modify': lambda x: self.multiply_hundred(x)
             }
